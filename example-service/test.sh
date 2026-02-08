@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
+process.env.NODE_ENV = 'test'
+
 const Test = require('thunk-test')
 const assert = require('assert')
 const HTTP = require('presidium/HTTP')
 const { spawn } = require('child_process')
 const package = require('./package.json')
-
-process.env.NODE_ENV = 'test'
 const {
   PORT,
 } = package.env[process.env.NODE_ENV]

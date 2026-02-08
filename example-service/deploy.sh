@@ -1,17 +1,15 @@
 #!/usr/bin/env node
 
+if (process.env.NODE_ENV == null) {
+  throw new Error('NODE_ENV required')
+}
+
 const AwsCredentials = require('presidium/AwsCredentials')
 const AWSConfig = require('../AWSConfig.json')
 const ports = require('../ports.json')
 const package = require('./package')
 
 setImmediate(async () => {
-  const env = process.env.NODE_ENV
-
-  if (env == null) {
-    throw new Error('NODE_ENV required')
-  }
-
   const awsCreds = await AwsCredentials(AWSConfig.profile)
   awsCreds.region = AWSConfig.region
 
@@ -35,8 +33,8 @@ setImmediate(async () => {
     cmd: ['./run.sh'],
     healthCmd: ['curl', '127.0.0.1:8080/health'],
     env: {
-      NODE_ENV: env,
-      ...package.env[env],
+      NODE_ENV: process.env.NODE_ENV,
+      ...package.env[process.env.NODE_ENV],
     },
     ...servicePort == null ? {} : {
       publish: {
