@@ -47,6 +47,7 @@ setImmediate(async () => {
     password,
   }
 
+  console.log(`Deploying ${package.name}@${package.version}...`)
   try {
     await docker.createService(package.name, serviceOptions)
   } catch (_error) {
