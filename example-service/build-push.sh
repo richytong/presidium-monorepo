@@ -77,6 +77,8 @@ USER node
 
   const registry = `${AWSConfig.accountId}.dkr.ecr.${AWSConfig.region}.amazonaws.com`
 
+  await ecr.createRepository(`${registry}/${package.name}`).catch(() => {})
+
   await docker.tagImage(
     image,
     `${registry}/${image}`,
