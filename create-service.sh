@@ -231,4 +231,26 @@ setImmediate(async () => {
   `.trim())
 
   await fs.promises.chmod(`${__dirname}/${serviceName}/deploy.sh`, 0o755)
+
+  const allocatePort = process.argv.indexOf('--allocate-port') > 0
+  if (allocatePort) {
+    console.log('Allocating port...')
+
+    const ports = require('./ports.json')
+    if (serviceName in ports) {
+      throw new Error(`Service ${serviceName} is already in ports.json.`)
+    }
+
+    const maximumPort = Math.max(...Object.values(ports))
+    if (maximumPort + 1 > 65535) {
+      throw new Error('Maximum port reached in ports.json.')
+    }
+
+    ports[serviceName] = maximumPort + 1
+
+    await fs.promises.writeFile(
+      `${__dirname}/ports.json`,
+      JSON.stringify(ports, null, 2)
+    )
+  }
 })
