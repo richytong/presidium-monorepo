@@ -18,7 +18,7 @@ setImmediate(async () => {
   }
 
   for (const serviceName of serviceNames) {
-    const cmd = spawn(`${__dirname}/deploy.sh`, {
+    const cmd = spawn(`${__dirname}/${serviceNames}/deploy.sh`, {
       env: {
         ...process.env,
         NODE_ENV: process.env.NODE_ENV,
