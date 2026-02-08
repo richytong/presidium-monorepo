@@ -10,7 +10,6 @@ const AWSConfig = require('../AWSConfig.json')
 const ports = require('../ports.json')
 const monorepoPackage = require('../package.json')
 const package = require('./package.json')
-const secrets = package.secrets
 
 setImmediate(async function () {
   const env = process.env.NODE_ENV
@@ -35,7 +34,7 @@ setImmediate(async function () {
   secretsFile.write(`AWS_SECRET_ACCESS_KEY=${awsCreds.secretAccessKey}\n`)
   secretsFile.write(`AWS_REGION=${awsCreds.region}\n`)
 
-  for (const secretName of secrets[env] ?? []) {
+  for (const secretName of package.secrets[env] ?? []) {
     const secret = await secretsManager.getSecret(secretName)
     secretsFile.write(`${secretName}=${secret.SecretString}\n`)
   }
