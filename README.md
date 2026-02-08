@@ -85,7 +85,7 @@ production/SECRET_VARIABLE_2=<secret_variable_2_value>
 The service `build-push.sh` script. Builds the service with Docker, creating a Docker image of the service, and pushes the Docker image of the service to [Amazon ECR](https://aws.amazon.com/ecr/). Should only be run on a machine with the same architecture as an EC2 instance (`x86_64` or `arm64`).
 
 ### [<service_name>/deploy.sh](/example-service/deploy.sh)
-The service `deploy.sh` script. Deploys the service to the Docker swarm using the Presidium Docker client. If the service has a port allocated, `deploy.sh` reads the service port from [`ports.json`](#ports.json). Should only be run on a manger node.
+The service `deploy.sh` script. Deploys the service to the Docker swarm using the Presidium Docker client. If the service has a port allocated, `deploy.sh` reads the service port from [`ports.json`](/ports.json). Should only be run on a manger node.
 
 References:
   * [Docker Swarm](https://docs.docker.com/engine/swarm/)
