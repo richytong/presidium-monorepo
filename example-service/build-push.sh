@@ -10,7 +10,7 @@ const AWSConfig = require('../AWSConfig.json')
 const ports = require('../ports.json')
 const monorepoPackage = require('../package.json')
 const package = require('./package.json')
-const secrets = require('./secrets.json')
+const secrets = package.secrets
 
 setImmediate(async function () {
   const env = process.env.NODE_ENV
