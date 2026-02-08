@@ -22,6 +22,7 @@ presidium-monorepo/
     swarmConfig.json
     package.json
     create-service.sh
+    import-service.sh
     deploy-all.sh
     init-swarm.sh
     destroy-swarm.sh
@@ -117,14 +118,42 @@ The monorepo project configuration.
   * `dependencies` - external dependencies needed by the monorepo.
 
 ### [create-service.sh](/create-service.sh)
-The `create-service.sh` script. Creates a new service project. If the `--allocate-port` option is specified, allocates a new port in `ports.json` for the service.
-
-The new service project will be created with the following files:
+The `create-service.sh` script. Creates a new service project with the following files:
   * [run.sh](#<service_name>/run.sh)
   * [test.sh](#<service_name>/test.sh)
   * [package.json](#<service_name>/package.json)
   * [build-push.sh](#<service_name>/build-push.sh)
   * [deploy.sh](#<service_name>/deploy.sh)
+
+Usage:
+```sh
+./create-service.sh <service_project_name> [--base-image <base_docker_image>] [--allocate-port]
+```
+
+Arguments:
+  * `service_project_name` - an optional name of the imported service project. If this argument is missing, the service project name defaults to the value of `your_project`.
+
+Options:
+  * `--base-image <base_docker_image>` - the base docker image for the imported service project. Defaults to `node:24-alpine` (defined as `defaultBaseImage` in the monorepo `package.json`).
+  * `--allocate-port` - allocates a new port in `ports.json` for the service.
+
+### [import-service.sh](/import-service.sh)
+The `import-service.sh` script. Imports a GitHub repository as a service project.
+
+Usage:
+```sh
+./import-service.sh <github_url> [service_project_name] [--base-image <base_docker_image>] [--allocate-port]
+```
+
+Arguments:
+  * `github_url` - the GitHub url of the service project. Can have the following formats:
+    * `git@github.com/<your_username>/<your_project>`
+    * `https://github.com/<your_username>/<your_project>`
+
+Options:
+  * `service_project_name` - an optional name of the imported service project. If this argument is missing, the service project name defaults to the value of `your_project`.
+  * `--base-image <base_docker_image>` - the base docker image for the imported service project. Defaults to `node:24-alpine` (defined as `defaultBaseImage` in the monorepo `package.json`).
+  * `--allocate-port` - allocates a new port in `ports.json` for the service.
 
 ### [deploy-all.sh](/deploy-all.sh)
 The `deploy-all.sh` script. Deploys all services in the monorepo to the Docker swarm.
@@ -156,6 +185,19 @@ Ensure `<your_aws_profile>` matches the value for `profile` in `AWSConfig.json`.
 Create a new service project under the path and name `service_name`. The new service project will contain the `run.sh`, `test.sh`, and `package.json` files.
 ```sh
 ./create-service.sh <service_name>
+```
+
+## Import a project as a service
+Project requirements:
+  * `run.sh` file - the service entrypoint. This file is used to start the service.
+
+Run the `import-service.sh` script.
+```
+# ssh
+./import-service.sh git@github.com/<your_username>/<your_project>
+
+# https
+./import-service.sh https://github.com/<your_username>/<your_project>
 ```
 
 ## Build and push a service

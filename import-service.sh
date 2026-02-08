@@ -1,20 +1,19 @@
 #!/usr/bin/env node
 
 const fs = require('fs')
-const package = require('./package')
+const { spawn } = require('child_process')
 
 setImmediate(async () => {
-  const serviceName = process.argv[2]
+  const url = process.argv[2]
 
-  if (serviceName == null) {
-    throw new Error('serviceName argument required.')
+  if (url == null) {
+    throw new Error('url argument required.')
   }
 
-  if (/[^a-z0-9-]/g.test(serviceName)) {
-    throw new Error('serviceName can only contain lowercase letters, numbers, and dashes (`-`)')
-  }
+  const urlParts = url.split('/')
+  const serviceName = process.argv[3] ?? urlParts[urlParts.length - 1].replace('.git', '')
 
-  console.log(`Creating service ${serviceName}...`)
+  console.log(`Importing service ${serviceName}...`)
 
   const baseImage = process.argv.includes('--base-image')
     ? process.argv[process.argv.indexOf('--base-image') + 1]
@@ -22,42 +21,33 @@ setImmediate(async () => {
 
   console.log(`Base image: ${baseImage}`)
 
-  await fs.promises.mkdir(`${__dirname}/${serviceName}`)
+  {
+    const cmd = spawn('git', [
+      'clone',
+      url,
+      ...process.argv[3] == null ? [] : [process.argv[3]],
+    ], {
+      cwd: __dirname,
+    })
+    cmd.stdout.pipe(process.stdout)
+    cmd.stderr.pipe(process.stderr)
 
-  await fs.promises.writeFile(`${__dirname}/${serviceName}/run.sh`, `
-#!/usr/bin/env node
+    cmd.stderr.on('data', chunk => {
+      const message = chunk.toString('utf8')
+      if (message.includes('fatal')) {
+        process.exit(1)
+      }
+    })
 
-if (process.env.NODE_ENV == null) {
-  throw new Error('NODE_ENV required')
-}
+    process.on('exit', () => {
+      cmd.kill()
+    })
 
-async function run() {
-}
-
-run()
-  `.trim())
-
-  await fs.promises.chmod(`${__dirname}/${serviceName}/run.sh`, 0o755)
-
-  await fs.promises.writeFile(`${__dirname}/${serviceName}/test.sh`, '#!/bin/sh\n\n')
-
-  await fs.promises.chmod(`${__dirname}/${serviceName}/test.sh`, 0o755)
-
-  await fs.promises.writeFile(`${__dirname}/${serviceName}/package.json`, `
-{
-  "name": "${serviceName}",
-  "version": "0.0.0",
-  "env": {
-    "test": {
-    },
-    "production": {
-    }
-  },
-  "secrets": {
-    "production": []
+    await new Promise((resolve, reject) => {
+      cmd.on('close', resolve)
+      cmd.on('error', reject)
+    })
   }
-}
-  `.trim())
 
   await fs.promises.writeFile(`${__dirname}/${serviceName}/build-push.sh`, `
 #!/usr/bin/env node

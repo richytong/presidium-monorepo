@@ -2,5 +2,6 @@
   "name": "api.example.com",
   "dependencies": {
     "presidium": "^1.4.2"
-  }
+  },
+  "defaultBaseImage": "node:24-alpine"
 }
