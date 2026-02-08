@@ -46,7 +46,7 @@ setImmediate(async function () {
 
   const image = `${package.name}:${package.version}`
 
-  const buildStream = await docker.buildImage(path, {
+  const buildStream = await docker.buildImage(__dirname, {
     ignore: ['.github', 'node_modules', 'build-push', 'deploy', 'test.js'],
     image,
     archive: {
