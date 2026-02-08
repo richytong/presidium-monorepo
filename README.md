@@ -174,11 +174,13 @@ Deploy a service to a Docker swarm. Should only be run on a manager node.
   * EC2 security groups should use the default VPC security group.
   * Amazon Linux 2023 is recommended for general use with Docker Swarm.
   * Each EC2 instance needs to install git, Docker, Node.js, and npm.
-  * The manager node EC2 instance needs to have the `~/.npmrc` and `~/.aws/credentials` files.
+  * Manager nodes need to have the `~/.npmrc` and `~/.aws/credentials` files.
+  * Worker nodes need to have the `~/.aws/credentials` file.
 
 ## Useful Docker Swarm cli commands
   * `docker service ls` - lists the Docker services currently running on the swarm.
   * `docker node ls` - lists the Docker nodes currently running on the swarm.
+  * `docker service ps` - inspect the tasks of a service. Useful for seeing the status of the deployment of a service.
   * `docker service update --force` - force resets a Docker service. Sometimes useful for fixing a service that has issues deploying.
   * `docker service rollback` - rolls a service back to the previous version.
   * `docker service rm` - removes a service.
