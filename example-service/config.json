@@ -1,0 +1,8 @@
+{
+  "test": {
+    "PORT": 7357
+  },
+  "production": {
+    "PORT": 8080
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "example-service",
+  "version": "3.0.2",
+  "dependencies": {
+    "presidium": "^1.3.2"
+  },
+  "devDependencies": {
+    "thunk-test": "^1.3.8"
+  },
+  "env": {
+    "test": {
+      "PORT": 7357
+    },
+    "production": {
+      "PORT": 8080
+    }
+  },
+  "secrets": {}
+}
