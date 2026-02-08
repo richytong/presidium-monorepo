@@ -41,7 +41,7 @@ The test entrypoint for the service. The test command should go here
 The service project configuration.
 
 `package.json` fields:
-  * `name` - the name of the service. Can only contain letters, numbers, and dashes (`-`).
+  * `name` - the name of the service. Can only contain lowercase letters, numbers, and dashes (`-`).
   * `version` - the version of the service.
   * `dependencies` - external dependencies needed by the service.
   * `env` - the environment-specific environment variables that will be provided to the service environment.

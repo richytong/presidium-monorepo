@@ -9,11 +9,15 @@ setImmediate(async () => {
     throw new Error('serviceName required.')
   }
 
+  if (/[^a-z0-9-]/g.test(serviceName)) {
+    throw new Error('serviceName can only contain lowercase letters, numbers, and dashes (`-`)')
+  }
+
   console.log(`Creating service ${serviceName}...`)
 
-  await fs.mkdir(`${__dirname}/${serviceName}`)
+  await fs.promises.mkdir(`${__dirname}/${serviceName}`)
 
-  await fs.promises.writeFile(`${__dirname}/run.sh`, `
+  await fs.promises.writeFile(`${__dirname}/${serviceName}/run.sh`, `
 #!/usr/bin/env node
 
 if (process.env.NODE_ENV == null) {
@@ -28,11 +32,11 @@ run()
 
   await fs.promises.chmod(`${__dirname}/run.sh`, 0o755)
 
-  await fs.promises.writeFile(`${__dirname}/test.sh`, '#!/bin/sh\n\n')
+  await fs.promises.writeFile(`${__dirname}/${serviceName}/test.sh`, '#!/bin/sh\n\n')
 
   await fs.promises.chmod(`${__dirname}/test.sh`, 0o755)
 
-  await fs.promises.writeFile(`${__dirname}/package.json`, `
+  await fs.promises.writeFile(`${__dirname}/${serviceName}/package.json`, `
 {
   "name": "${serviceName}",
   "version": "0.0.0",
@@ -48,7 +52,7 @@ run()
 }
   `.trim())
 
-  await fs.promises.writeFile(`${__dirname}/build-push.sh`, `
+  await fs.promises.writeFile(`${__dirname}/${serviceName}/build-push.sh`, `
 #!/usr/bin/env node
 
 const AwsCredentials = require('presidium/AwsCredentials')
