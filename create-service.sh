@@ -30,11 +30,11 @@ async function run() {
 run()
   `.trim())
 
-  await fs.promises.chmod(`${__dirname}/run.sh`, 0o755)
+  await fs.promises.chmod(`${__dirname}/${serviceName}/run.sh`, 0o755)
 
   await fs.promises.writeFile(`${__dirname}/${serviceName}/test.sh`, '#!/bin/sh\n\n')
 
-  await fs.promises.chmod(`${__dirname}/test.sh`, 0o755)
+  await fs.promises.chmod(`${__dirname}/${serviceName}/test.sh`, 0o755)
 
   await fs.promises.writeFile(`${__dirname}/${serviceName}/package.json`, `
 {
@@ -164,9 +164,9 @@ USER node
 })
   `.trim())
 
-  await fs.promises.chmod(`${__dirname}/build-push.sh`, 0o755)
+  await fs.promises.chmod(`${__dirname}/${serviceName}/build-push.sh`, 0o755)
 
-  await fs.promises.writeFile(`${__dirname}/deploy.sh`, `
+  await fs.promises.writeFile(`${__dirname}/${serviceName}/deploy.sh`, `
 #!/usr/bin/env node
 
 if (process.env.NODE_ENV == null) {
@@ -230,5 +230,5 @@ setImmediate(async () => {
 })
   `.trim())
 
-  await fs.promises.chmod(`${__dirname}/deploy.sh`, 0o755)
+  await fs.promises.chmod(`${__dirname}/${serviceName}/deploy.sh`, 0o755)
 })
