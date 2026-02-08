@@ -1,0 +1,8 @@
+{
+  "production": {
+    "name": "production-example-swarm"
+  },
+  "staging": {
+    "name": "staging-example-swarm"
+  }
+}

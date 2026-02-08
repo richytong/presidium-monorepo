@@ -1,0 +1,6 @@
+{
+  "name": "api.example.com",
+  "dependencies": {
+    "presidium": "^1.3.2"
+  }
+}
