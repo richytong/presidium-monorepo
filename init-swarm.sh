@@ -29,18 +29,18 @@ setImmediate(async () => {
 
   const docker = new Docker({ apiVersion: '1.44' })
 
+  const address = getPublicIPv4Address()
+  if (address == null) {
+    throw new Error('Public IPv4 address not found.')
+  }
+
   console.log('Initializing swarm...')
-  await docker.initSwarm('[::1]:2377')
+  await docker.initSwarm(`${address}:2377`)
 
   console.log('Saving join tokens...')
   const swarmData = await docker.inspectSwarm()
   await secretsManager.putSecret(`${swarmName}/WORKER_JOIN_TOKEN`, swarmData.JoinTokens.Worker)
   await secretsManager.putSecret(`${swarmName}/MANAGER_JOIN_TOKEN`, swarmData.JoinTokens.Manager)
-
-  const address = getPublicIPv4Address()
-  if (address == null) {
-    throw new Error('Public IPv4 address not found.')
-  }
 
   console.log('Saving swarm address...')
   await swarmAddressTable.putItemJSON({

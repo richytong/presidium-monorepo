@@ -50,18 +50,16 @@ setImmediate(async () => {
     ? await secretsManager.getSecretString(`${swarmName}/MANAGER_JOIN_TOKEN`)
     : await secretsManager.getSecretString(`${swarmName}/WORKER_JOIN_TOKEN`)
 
-    console.log(JoinToken, RemoteAddrs)
-
-  console.log('Joining swarm...')
-  await docker.joinSwarm('[::1]:2377', {
-    JoinToken,
-    RemoteAddrs,
-  })
-
   const address = getPublicIPv4Address()
   if (address == null) {
     throw new Error('Public IPv4 address not found.')
   }
+
+  console.log('Joining swarm...')
+  await docker.joinSwarm(`${address}:2377`, {
+    JoinToken,
+    RemoteAddrs,
+  })
 
   console.log('Saving swarm address...')
   await swarmAddressTable.putItemJSON({
