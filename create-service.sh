@@ -5,8 +5,8 @@ const fs = require('fs')
 setImmediate(async () => {
   const serviceName = process.argv[2]
 
-  if (!serviceName) {
-    throw new Error('serviceName required.')
+  if (serviceName == null) {
+    throw new Error('serviceName argument required.')
   }
 
   if (/[^a-z0-9-]/g.test(serviceName)) {
