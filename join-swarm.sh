@@ -42,13 +42,15 @@ setImmediate(async () => {
     'swarmName = :swarmName AND createTime > :createTime',
     { swarmName, createTime: 1 },
     { Limit: 10, ScanIndexForward: false }
-  ).then(data => data.ItemsJSON)
+  ).then(data => data.ItemsJSON.map(item => `${item.address}:2377`))
 
   console.log('Retrieving join token...')
   const isManager = process.argv.includes('-m') || process.argv.includes('--manager')
   const JoinToken = isManager
     ? await secretsManager.getSecretString(`${swarmName}/MANAGER_JOIN_TOKEN`)
     : await secretsManager.getSecretString(`${swarmName}/WORKER_JOIN_TOKEN`)
+
+    console.log(JoinToken, RemoteAddrs)
 
   console.log('Joining swarm...')
   await docker.joinSwarm('[::1]:2377', {
