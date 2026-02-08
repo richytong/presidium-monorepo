@@ -38,7 +38,7 @@ setImmediate(async function () {
   }
   secretsFile.end()
 
-  const docker = new Docker()
+  const docker = new Docker({ apiVersion: '1.44' })
 
   const ecr = new ECR({ ...awsCreds })
 
