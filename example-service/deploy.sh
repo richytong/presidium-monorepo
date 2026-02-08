@@ -26,7 +26,7 @@ setImmediate(async () => {
   const registry = `${AWSConfig.accountId}.dkr.ecr.${AWSConfig.region}.amazonaws.com`
 
   const authToken = await ecr.getAuthorizationToken()
-  const decoded = Buffer.from(options.authToken, 'base64').toString('utf8')
+  const decoded = Buffer.from(authToken, 'base64').toString('utf8')
   const [username, password] = decoded.split(':')
 
   const servicePort = ports[service.name]
