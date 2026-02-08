@@ -2,6 +2,7 @@
 
 const fs = require('fs')
 const { spawn } = require('child_process')
+const package = require('./package')
 
 setImmediate(async () => {
   const url = process.argv[2]
