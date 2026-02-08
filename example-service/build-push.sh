@@ -8,6 +8,7 @@ const ECR = require('presidium/ECR')
 const fs = require('fs')
 const AWSConfig = require('../AWSConfig.json')
 const ports = require('../ports.json')
+const monorepoPackage = require('../package.json')
 const package = require('./package.json')
 const secrets = require('./secrets.json')
 
@@ -44,7 +45,8 @@ setImmediate(async function () {
 
   const ecr = new ECR({ ...awsCreds })
 
-  const image = `${package.name}:${package.version}`
+  const serviceRepository = `${monorepoPackage.name}/${package.name}`
+  const image = `${serviceRepository}:${package.version}`
 
   const buildStream = await docker.buildImage(__dirname, {
     ignore: ['.github', 'node_modules', 'build-push', 'deploy', 'test.js'],
@@ -77,12 +79,12 @@ USER node
 
   const registry = `${AWSConfig.accountId}.dkr.ecr.${AWSConfig.region}.amazonaws.com`
 
-  await ecr.createRepository(`${registry}/${package.name}`).catch(() => {})
-
   await docker.tagImage(
     image,
     `${registry}/${image}`,
   )
+
+  await ecr.createRepository(serviceRepository).catch(() => {})
 
   const authToken = await ecr.getAuthorizationToken()
 
