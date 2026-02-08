@@ -84,7 +84,7 @@ setImmediate(async function () {
   npmrc.write(\`//registry.npmjs.org/:_authToken=\${npmToken}\`)
   npmrc.end()
 
-  const secretsFile = fs.createWriteStream(\`${__dirname}/.secrets\`)
+  const secretsFile = fs.createWriteStream(\`\${__dirname}/.secrets\`)
   secretsFile.write(\`AWS_ACCESS_KEY_ID=\${awsCreds.accessKeyId}\\n\`)
   secretsFile.write(\`AWS_SECRET_ACCESS_KEY=\${awsCreds.secretAccessKey}\\n\`)
   secretsFile.write(\`AWS_REGION=\${awsCreds.region}\\n\`)
