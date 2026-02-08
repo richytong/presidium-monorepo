@@ -6,6 +6,8 @@ if (process.env.NODE_ENV == null) {
 
 const AwsCredentials = require('presidium/AwsCredentials')
 const SecretsManager = require('presidium/SecretsManager')
+const Docker = require('presidium/Docker')
+const ECR = require('presidium/ECR')
 const AWSConfig = require('../AWSConfig.json')
 const ports = require('../ports.json')
 const package = require('./package')
