@@ -104,7 +104,7 @@ USER node
 
   await new Promise(resolve => pushStream.on('end', resolve))
 
-  await fs.promises.rm('.npmrc')
-  await fs.promises.rm('.secrets')
+  await fs.promises.rm(`${__dirname}/.npmrc`)
+  await fs.promises.rm(`${__dirname}/.secrets`)
 })
 
