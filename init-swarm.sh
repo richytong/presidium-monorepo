@@ -27,7 +27,7 @@ setImmediate(async () => {
   })
   await swarmAddressTable.ready
 
-  const docker = new Docker()
+  const docker = new Docker({ apiVersion: '1.44' })
 
   console.log('Initializing swarm...')
   await docker.initSwarm('[::1]:2377')
