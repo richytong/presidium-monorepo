@@ -29,7 +29,7 @@ setImmediate(async () => {
   const decoded = Buffer.from(authToken, 'base64').toString('utf8')
   const [username, password] = decoded.split(':')
 
-  const servicePort = ports[service.name]
+  const servicePort = ports[package.name]
 
   const serviceOptions = {
     image: `${registry}/${image}`,
