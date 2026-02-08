@@ -35,7 +35,7 @@ A project that represents a service running on the Docker swarm.
 The service entrypoint. This file is used to start the service.
 
 ### [<service_name>/test.sh](/example-service/test.sh)
-The test entrypoint for the service. Integration and unit tests should go here.
+The test entrypoint for the service. The test command should go here
 
 ### [<service_name>/package.json](/example-service/package.json)
 The service project configuration.
@@ -45,9 +45,9 @@ The service project configuration.
   * `version` - the version of the service.
   * `dependencies` - external dependencies needed by the service.
   * `env` - the environment-specific environment variables that will be provided to the service environment.
-  * `secrets` - the environment-specific secrets that will be provided to and read from the `.secrets` file of the service.
+  * `secrets` - the environment-specific secrets that will be provided to and read from the `.secrets` file of the service. Warning: the `.secrets` file MUST be removed once read in production. The Presidium library offers a [`Secrets`](https://presidium.services/docs/Secrets) class that reads the `.secrets` file and removes the file after reading.
 
-`env` structure:
+`package.json` `env` structure:
 ```
 {
   production: {
@@ -62,6 +62,23 @@ The service project configuration.
   },
   ...
 }
+```
+
+`package.json` `secrets` structure
+```
+{
+  production: [
+    "production/SECRET_VARIABLE_1"
+    "production/SECRET_VARIABLE_2"
+    ...
+  ],
+}
+```
+
+`.secrets` file structure
+```
+production/SECRET_VARIABLE_1=<secret_variable_1_value>
+production/SECRET_VARIABLE_2=<secret_variable_2_value>
 ```
 
 ### [<service_name>/build-push.sh](/example-service/build-push.sh)
