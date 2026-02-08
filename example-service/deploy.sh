@@ -10,6 +10,7 @@ const Docker = require('presidium/Docker')
 const ECR = require('presidium/ECR')
 const AWSConfig = require('../AWSConfig.json')
 const ports = require('../ports.json')
+const monorepoPackage = require('../package.json')
 const package = require('./package')
 
 setImmediate(async () => {
@@ -22,8 +23,9 @@ setImmediate(async () => {
 
   const ecr = new ECR({ ...awsCreds })
 
-  const image = `${package.name}:${package.version}`
   const registry = `${AWSConfig.accountId}.dkr.ecr.${AWSConfig.region}.amazonaws.com`
+  const serviceRepository = `${monorepoPackage.name}/${package.name}`
+  const image = `${serviceRepository}:${package.version}`
 
   const authToken = await ecr.getAuthorizationToken()
   const decoded = Buffer.from(authToken, 'base64').toString('utf8')
