@@ -221,6 +221,7 @@ setImmediate(async () => {
   const decoded = Buffer.from(authToken, 'base64').toString('utf8')
   const [username, password] = decoded.split(':')
 
+  const serviceName = package.name.toLowerCase().replace(/[^a-z0-9]/g, '-')
   const servicePort = ports[package.name]
 
   const serviceOptions = {
@@ -242,11 +243,11 @@ setImmediate(async () => {
     password,
   }
 
-  console.log(\`Deploying \${package.name}@\${package.version}...\`)
+  console.log(\`Deploying \${serviceName}@\${package.version}...\`)
   try {
-    await docker.createService(package.name, serviceOptions)
+    await docker.createService(serviceName, serviceOptions)
   } catch (_error) {
-    await docker.updateService(package.name, serviceOptions)
+    await docker.updateService(serviceName, serviceOptions)
   }
 })
   `.trim())
