@@ -91,16 +91,26 @@ setImmediate(async function () {
   npmrc.write(\`//registry.npmjs.org/:_authToken=\${npmToken}\`)
   npmrc.end()
 
+  await new Promise(resolve => {
+    npmrc.on('close', resolve)
+  })
+
   const secretsFile = fs.createWriteStream(\`\${__dirname}/.secrets\`)
   secretsFile.write(\`AWS_ACCESS_KEY_ID=\${awsCreds.accessKeyId}\\n\`)
   secretsFile.write(\`AWS_SECRET_ACCESS_KEY=\${awsCreds.secretAccessKey}\\n\`)
   secretsFile.write(\`AWS_REGION=\${awsCreds.region}\\n\`)
 
-  for (const secretName of package.secrets[env] ?? []) {
-    const secret = await secretsManager.getSecret(secretName)
-    secretsFile.write(\`\${secretName}=\${secret.SecretString}\\n\`)
+  if (package.secrets) {
+    for (const secretName of package.secrets[env] ?? []) {
+      const secret = await secretsManager.getSecret(secretName)
+      secretsFile.write(\`\${secretName}=\${secret.SecretString}\\n\`)
+    }
   }
   secretsFile.end()
+
+  await new Promise(resolve => {
+    secretsFile.on('close', resolve)
+  })
 
   const docker = new Docker({ apiVersion: '1.44' })
 
@@ -109,23 +119,15 @@ setImmediate(async function () {
   const serviceRepository = \`\${monorepoPackage.name}/\${package.name}\`
   const image = \`\${serviceRepository}:\${package.version}\`
 
+  const DockerfilePath = process.argv.includes('--Dockerfile')
+    ? process.argv[process.argv.indexOf('--Dockerfile') + 1]
+    : 'Dockerfile'
+
   const buildStream = await docker.buildImage(__dirname, {
     ignore: ['.github', 'node_modules', 'build-push', 'deploy', 'test.js'],
     image,
-    archive: {
-      Dockerfile: \`
-FROM ${baseImage}
-WORKDIR /home/node
-COPY . .
-RUN apk add curl \
-  && npm i \
-  && chmod +x ./run.sh \
-  && rm .npmrc \
-  && rm Dockerfile
-USER node
-      \`, 
-    },
     platform: 'x86_64',
+    archiveDockerfile: DockerfilePath,
   })
 
   buildStream.on('data', chunk => {
@@ -172,6 +174,18 @@ USER node
   `.trim())
 
   await fs.promises.chmod(`${__dirname}/${serviceName}/build-push.sh`, 0o755)
+
+  await fs.promises.writeFile(`${__dirname}/${serviceName}/Dockerfile`, `
+FROM ${baseImage}
+WORKDIR /home/node
+COPY . .
+RUN apk add curl \\
+  && npm i \\
+  && chmod +x ./run.sh \\
+  && rm .npmrc \\
+  && rm Dockerfile
+USER node
+  `.trim())
 
   await fs.promises.writeFile(`${__dirname}/${serviceName}/deploy.sh`, `
 #!/usr/bin/env node

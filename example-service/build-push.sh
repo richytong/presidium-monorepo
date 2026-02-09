@@ -47,23 +47,15 @@ setImmediate(async function () {
   const serviceRepository = `${monorepoPackage.name}/${package.name}`
   const image = `${serviceRepository}:${package.version}`
 
+  const DockerfilePath = process.argv.includes('--Dockerfile')
+    ? process.argv[process.argv.indexOf('--Dockerfile') + 1]
+    : 'Dockerfile'
+
   const buildStream = await docker.buildImage(__dirname, {
     ignore: ['.github', 'node_modules', 'build-push', 'deploy', 'test.js'],
     image,
-    archive: {
-      Dockerfile: `
-FROM node:24-alpine
-WORKDIR /home/node
-COPY . .
-RUN apk add curl \
-  && npm i \
-  && chmod +x ./run.sh \
-  && rm .npmrc \
-  && rm Dockerfile
-USER node
-      `, 
-    },
     platform: 'x86_64',
+    archiveDockerfile: DockerfilePath,
   })
 
   buildStream.on('data', chunk => {

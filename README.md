@@ -15,6 +15,7 @@ presidium-monorepo/
         run.sh
         test.sh
         package.json
+        Dockerfile
         build-push.sh
         deploy.sh
     ports.json
@@ -82,8 +83,22 @@ production/SECRET_VARIABLE_1=<secret_variable_1_value>
 production/SECRET_VARIABLE_2=<secret_variable_2_value>
 ```
 
+### [<service_name>/Dockerfile](/example-service/Dockerfile)
+The service `Dockerfile`. Used to build the Docker image of the service.
+
+References:
+  * [Dockerfile](https://docs.docker.com/reference/dockerfile/)
+
 ### [<service_name>/build-push.sh](/example-service/build-push.sh)
 The service `build-push.sh` script. Builds the service with Docker, creating a Docker image of the service, and pushes the Docker image of the service to [Amazon ECR](https://aws.amazon.com/ecr/). Should only be run on a machine with the same architecture as an EC2 instance (`x86_64` or `arm64`).
+
+Usage:
+```sh
+`./build-push [--Dockerfile <Dockerfile_path>]`
+```
+
+Options:
+  * `--Dockerfile <Dockerfile_path>` - tells Docker to use the Dockerfile at the path `<Dockerfile_path>` to build the service.
 
 ### [<service_name>/deploy.sh](/example-service/deploy.sh)
 The service `deploy.sh` script. Deploys the service to the Docker swarm using the Presidium Docker client. If the service has a port allocated, `deploy.sh` reads the service port from [`ports.json`](/ports.json). Should only be run on a manger node.
@@ -122,6 +137,7 @@ The `create-service.sh` script. Creates a new service project with the following
   * [run.sh](#<service_name>/run.sh)
   * [test.sh](#<service_name>/test.sh)
   * [package.json](#<service_name>/package.json)
+  * [Dockerfile](#<service_name>/Dockerfile)
   * [build-push.sh](#<service_name>/build-push.sh)
   * [deploy.sh](#<service_name>/deploy.sh)
 
