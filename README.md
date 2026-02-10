@@ -37,7 +37,9 @@ A project that represents a service running on the Docker swarm.
 The service entrypoint. This file is used to start the service.
 
 ### [<service_name>/test.sh](/example-service/test.sh)
-The test entrypoint for the service. The test command should go here
+The test entrypoint for the service. The test command should go here.
+
+Note: to use `mocha` for `test.sh`, change the shebang from `#!/usr/bin/env node` to `#!/usr/bin/env mocha`.
 
 ### [<service_name>/package.json](/example-service/package.json)
 The service project configuration.
@@ -243,3 +245,6 @@ Deploy a service to a Docker swarm. Should only be run on a manager node.
   * `docker service rollback` - rolls a service back to the previous version.
   * `docker service rm` - removes a service.
   * `docker system prune -af` - prunes unused containers and images from the node / EC2 instance.
+
+## Support
+ * minimum Node.js version: 22

@@ -39,7 +39,70 @@ run()
 
   await fs.promises.chmod(`${__dirname}/${serviceName}/run.sh`, 0o755)
 
-  await fs.promises.writeFile(`${__dirname}/${serviceName}/test.sh`, '#!/bin/sh\n\n')
+  await fs.promises.writeFile(`${__dirname}/${serviceName}/test.sh`, `
+#!/usr/bin/env node
+
+process.env.NODE_ENV = 'test'
+
+const AwsCredentials = require('presidium/AwsCredentials')
+const SecretsManager = require('presidium/SecretsManager')
+const fs = require('fs')
+const { spawn } = require('child_process')
+const AWSConfig = require('../AWSConfig.json')
+const package = require('./package.json')
+
+const packageEnv = package.env[process.env.NODE_ENV]
+for (const name in packageEnv) {
+  process.env[name] = packageEnv[name]
+}
+
+async function test() {
+  const awsCreds = await AwsCredentials(AWSConfig.profile)
+  awsCreds.region = AWSConfig.region
+
+  const secretsManager = new SecretsManager({ ...awsCreds })
+  const secretsFile = fs.createWriteStream(\`\${__dirname}/.secrets\`)
+  const packageSecrets = package.secrets[process.env.NODE_ENV]
+  for (const secretName of packageSecrets) {
+    try {
+      const secret = await secretsManager.getSecret(secretName)
+      secretsFile.write(\`\${secretName}=\${secret.SecretString}\\n\`)
+    } catch (error) {
+      error.secretName = secretName
+      console.error(error)
+      continue
+    }
+  }
+  secretsFile.end()
+  await new Promise(resolve => secretsFile.on('close', resolve))
+
+  const cmd = spawn(\`\${__dirname}/run.sh\`)
+  cmd.stdout.pipe(process.stdout)
+  cmd.stderr.pipe(process.stderr)
+
+  process.on('exit', () => {
+    cmd.kill()
+  })
+
+  const { promise: exitPromise, resolve, reject } = Promise.withResolvers()
+  cmd.on('exit', code => {
+    if (code == null || code == 0) {
+      console.log('Success')
+      resolve()
+    } else {
+      reject(new Error('Failure'))
+    }
+  })
+
+  // assertions
+
+  // cmd.kill()
+
+  await exitPromise
+}
+
+test()
+  `.trim())
 
   await fs.promises.chmod(`${__dirname}/${serviceName}/test.sh`, 0o755)
 
@@ -48,13 +111,24 @@ run()
   "name": "${serviceName}",
   "version": "0.0.0",
   "env": {
-    "test": {
-    },
     "production": {
+      "MYVAR1": "example1",
+      "MYVAR2": "example2"
+    },
+    "test": {
+      "MYVAR1": "testexample1",
+      "MYVAR2": "testexample2"
     }
   },
   "secrets": {
-    "production": []
+    "production": [
+      "MYSECRET1",
+      "MYSECRET2"
+    ],
+    "test": [
+      "MYSECRET1",
+      "MYSECRET2"
+    ]
   }
 }
   `.trim())

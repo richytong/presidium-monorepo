@@ -1,7 +1,7 @@
 {
   "name": "api.example.com",
   "dependencies": {
-    "presidium": "^1.4.2"
+    "presidium": "^1.4.4"
   },
   "defaultBaseImage": "node:24-alpine"
 }

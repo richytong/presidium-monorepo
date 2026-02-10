@@ -4,6 +4,7 @@ if (process.env.NODE_ENV == null) {
   throw new Error('NODE_ENV required')
 }
 
+const Secrets = require('presidium/Secrets')
 const http = require('http')
 const squareHandler = require('./squareHandler')
 const exampleHandler = require('./exampleHandler')
@@ -12,6 +13,8 @@ const package = require('./package.json')
 const { PORT } = process.env
 
 async function run() {
+  const secrets = await Secrets()
+
   const server = http.createServer(async (request, response) => {
     if (request.url.startsWith('/health')) {
       response.writeHead(200, {
