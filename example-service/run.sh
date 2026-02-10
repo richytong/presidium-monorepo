@@ -13,7 +13,7 @@ const package = require('./package.json')
 const { PORT } = process.env
 
 async function run() {
-  const secrets = await Secrets()
+  const secrets = await Secrets(`${__dirname}/.secrets`)
 
   const server = http.createServer(async (request, response) => {
     if (request.url.startsWith('/health')) {
