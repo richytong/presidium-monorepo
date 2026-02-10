@@ -28,6 +28,9 @@ async function test() {
 
   const secretsManager = new SecretsManager({ ...awsCreds })
   const secretsFile = fs.createWriteStream(`${__dirname}/.secrets`)
+  secretsFile.write(`AWS_ACCESS_KEY_ID=${awsCreds.accessKeyId}\n`)
+  secretsFile.write(`AWS_SECRET_ACCESS_KEY=${awsCreds.secretAccessKey}\n`)
+  secretsFile.write(`AWS_REGION=${awsCreds.region}\n`)
   const packageSecrets = package.secrets[process.env.NODE_ENV]
   for (const secretName of packageSecrets) {
     try {
