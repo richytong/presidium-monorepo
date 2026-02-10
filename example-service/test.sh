@@ -7,9 +7,11 @@ const assert = require('assert')
 const HTTP = require('presidium/HTTP')
 const { spawn } = require('child_process')
 const package = require('./package.json')
-const {
-  PORT,
-} = package.env[process.env.NODE_ENV]
+
+const packageEnv = package.env[process.env.NODE_ENV]
+for (const name in packageEnv) {
+  process.env[name] = packageEnv[name]
+}
 
 const aggregateUnitTest = Test.all([
   require('./square.test.js')
@@ -37,7 +39,7 @@ const integrationTest = new Test('test.sh', async function integration() {
     await new Promise(resolve => setTimeout(resolve, 100))
   }
 
-  const http = new HTTP(`http://localhost:${PORT}/`)
+  const http = new HTTP(`http://localhost:${process.env.PORT}/`)
 
   {
     const response = await http.get('/health')

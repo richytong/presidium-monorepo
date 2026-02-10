@@ -8,9 +8,8 @@ const http = require('http')
 const squareHandler = require('./squareHandler')
 const exampleHandler = require('./exampleHandler')
 const package = require('./package.json')
-const {
-  PORT,
-} = package.env[process.env.NODE_ENV]
+
+const { PORT } = process.env
 
 async function run() {
   const server = http.createServer(async (request, response) => {
