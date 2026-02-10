@@ -54,12 +54,12 @@ const { spawn } = require('child_process')
 const AWSConfig = require('../AWSConfig.json')
 const package = require('./package.json')
 
-const { NODE_ENV } = process.env
-
-const packageEnv = package.env[NODE_ENV]
+const packageEnv = package.env[process.env.NODE_ENV]
 for (const name in packageEnv) {
   process.env[name] = packageEnv[name]
 }
+
+const { NODE_ENV } = process.env
 
 async function test() {
   const awsCreds = await AwsCredentials(AWSConfig.profile)
