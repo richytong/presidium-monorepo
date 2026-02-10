@@ -1,0 +1,27 @@
+{
+  "name": "rubico-service-example",
+  "version": "0.0.0",
+  "dependencies": {
+    "presidium": "^1.4.4"
+  },
+  "env": {
+    "production": {
+      "AWS_REGION": "us-east-1",
+      "PORT": "8080"
+    },
+    "test": {
+      "AWS_REGION": "us-east-1",
+      "PORT": "7357"
+    }
+  },
+  "secrets": {
+    "production": [
+      "MYSECRET1",
+      "MYSECRET2"
+    ],
+    "test": [
+      "MYSECRET1",
+      "MYSECRET2"
+    ]
+  }
+}
