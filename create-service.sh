@@ -34,7 +34,7 @@ if (process.env.NODE_ENV == null) {
 const Secrets = require('presidium/Secrets')
 
 async function run() {
-  const secrets = await Secrets()
+  const secrets = await Secrets(\`\${__dirname}/.secrets\`)
 }
 
 run()
@@ -54,7 +54,9 @@ const { spawn } = require('child_process')
 const AWSConfig = require('../AWSConfig.json')
 const package = require('./package.json')
 
-const packageEnv = package.env[process.env.NODE_ENV]
+const { NODE_ENV } = process.env
+
+const packageEnv = package.env[NODE_ENV]
 for (const name in packageEnv) {
   process.env[name] = packageEnv[name]
 }
@@ -68,10 +70,10 @@ async function test() {
   secretsFile.write(\`AWS_ACCESS_KEY_ID=\${awsCreds.accessKeyId}\\n\`)
   secretsFile.write(\`AWS_SECRET_ACCESS_KEY=\${awsCreds.secretAccessKey}\\n\`)
   secretsFile.write(\`AWS_REGION=\${awsCreds.region}\\n\`)
-  const packageSecrets = package.secrets[process.env.NODE_ENV]
+  const packageSecrets = package.secrets[NODE_ENV]
   for (const secretName of packageSecrets) {
     try {
-      const secret = await secretsManager.getSecret(secretName)
+      const secret = await secretsManager.getSecret(\`\${NODE_ENV}/\${secretName}\`)
       secretsFile.write(\`\${secretName}=\${secret.SecretString}\\n\`)
     } catch (error) {
       error.secretName = secretName
