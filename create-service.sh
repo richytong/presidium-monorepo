@@ -110,6 +110,9 @@ test()
 {
   "name": "${serviceName}",
   "version": "0.0.0",
+  "dependencies": {
+    "presidium": "^1.4.4"
+  },
   "env": {
     "production": {
       "MYVAR1": "example1",
