@@ -31,7 +31,10 @@ if (process.env.NODE_ENV == null) {
   throw new Error('NODE_ENV required')
 }
 
+const Secrets = require('presidium/Secrets')
+
 async function run() {
+  const secrets = await Secrets()
 }
 
 run()
