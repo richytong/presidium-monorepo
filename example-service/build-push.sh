@@ -29,6 +29,10 @@ setImmediate(async function () {
   npmrc.write(`//registry.npmjs.org/:_authToken=${npmToken}`)
   npmrc.end()
 
+  await new Promise(resolve => {
+    npmrc.on('close', resolve)
+  })
+
   const secretsFile = fs.createWriteStream(`${__dirname}/.secrets`)
   secretsFile.write(`AWS_ACCESS_KEY_ID=${awsCreds.accessKeyId}\n`)
   secretsFile.write(`AWS_SECRET_ACCESS_KEY=${awsCreds.secretAccessKey}\n`)
@@ -39,6 +43,10 @@ setImmediate(async function () {
     secretsFile.write(`${secretName}=${secret.SecretString}\n`)
   }
   secretsFile.end()
+
+  await new Promise(resolve => {
+    secretsFile.on('close', resolve)
+  })
 
   const docker = new Docker({ apiVersion: '1.44' })
 
