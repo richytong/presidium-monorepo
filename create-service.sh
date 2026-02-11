@@ -70,15 +70,16 @@ async function test() {
   secretsFile.write(\`AWS_ACCESS_KEY_ID=\${awsCreds.accessKeyId}\\n\`)
   secretsFile.write(\`AWS_SECRET_ACCESS_KEY=\${awsCreds.secretAccessKey}\\n\`)
   secretsFile.write(\`AWS_REGION=\${awsCreds.region}\\n\`)
-  const packageSecrets = package.secrets[NODE_ENV]
-  for (const secretName of packageSecrets) {
-    try {
-      const secret = await secretsManager.getSecret(\`\${NODE_ENV}/\${secretName}\`)
-      secretsFile.write(\`\${secretName}=\${secret.SecretString}\\n\`)
-    } catch (error) {
-      error.secretName = secretName
-      console.error(error)
-      continue
+  if (package.secrets) {
+    for (const secretName of package.secrets) {
+      try {
+        const secret = await secretsManager.getSecret(\`\${NODE_ENV}/\${secretName}\`)
+        secretsFile.write(\`\${secretName}=\${secret.SecretString}\\n\`)
+      } catch (error) {
+        error.secretName = secretName
+        console.error(error)
+        continue
+      }
     }
   }
   secretsFile.end()
@@ -147,6 +148,10 @@ test()
   await fs.promises.writeFile(`${__dirname}/${serviceName}/build-push.sh`, `
 #!/usr/bin/env node
 
+if (process.env.NODE_ENV == null) {
+  throw new Error('NODE_ENV required')
+}
+
 const AwsCredentials = require('presidium/AwsCredentials')
 const NpmToken = require('presidium/NpmToken')
 const SecretsManager = require('presidium/SecretsManager')
@@ -158,19 +163,13 @@ const ports = require('../ports.json')
 const monorepoPackage = require('../package.json')
 const package = require('./package.json')
 
+const { NODE_ENV } = process.env
+
 setImmediate(async function () {
-  const env = process.env.NODE_ENV
-
-  if (env == null) {
-    throw new Error('NODE_ENV required')
-  }
-
   const awsCreds = await AwsCredentials(AWSConfig.profile)
   awsCreds.region = AWSConfig.region
 
   const npmToken = await NpmToken()
-
-  const secretsManager = new SecretsManager({ ...awsCreds })
 
   const npmrc = fs.createWriteStream(\`\${__dirname}/.npmrc\`)
   npmrc.write(\`//registry.npmjs.org/:_authToken=\${npmToken}\`)
@@ -180,15 +179,21 @@ setImmediate(async function () {
     npmrc.on('close', resolve)
   })
 
+  const secretsManager = new SecretsManager({ ...awsCreds })
   const secretsFile = fs.createWriteStream(\`\${__dirname}/.secrets\`)
   secretsFile.write(\`AWS_ACCESS_KEY_ID=\${awsCreds.accessKeyId}\\n\`)
   secretsFile.write(\`AWS_SECRET_ACCESS_KEY=\${awsCreds.secretAccessKey}\\n\`)
   secretsFile.write(\`AWS_REGION=\${awsCreds.region}\\n\`)
-
   if (package.secrets) {
-    for (const secretName of package.secrets[env] ?? []) {
-      const secret = await secretsManager.getSecret(secretName)
-      secretsFile.write(\`\${secretName}=\${secret.SecretString}\\n\`)
+    for (const secretName of package.secrets[NODE_ENV] ?? []) {
+      try {
+        const secret = await secretsManager.getSecret(\`\${NODE_ENV}/\${secretName}\`)
+        secretsFile.write(\`\${secretName}=\${secret.SecretString}\\n\`)
+      } catch (error) {
+        error.secretName = secretName
+        console.error(error)
+        continue
+      }
     }
   }
   secretsFile.end()
