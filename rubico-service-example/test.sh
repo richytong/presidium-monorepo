@@ -2,18 +2,18 @@
 
 process.env.NODE_ENV = 'test'
 
+const package = require('./package.json')
+const packageEnv = package.env[process.env.NODE_ENV]
+for (const name in packageEnv) {
+  process.env[name] = packageEnv[name]
+}
+
 const AwsCredentials = require('presidium/AwsCredentials')
 const SecretsManager = require('presidium/SecretsManager')
 const assert = require('assert')
 const fs = require('fs')
 const { spawn } = require('child_process')
 const AWSConfig = require('../AWSConfig.json')
-const package = require('./package.json')
-
-const packageEnv = package.env[process.env.NODE_ENV]
-for (const name in packageEnv) {
-  process.env[name] = packageEnv[name]
-}
 
 const { NODE_ENV, PORT } = process.env
 
