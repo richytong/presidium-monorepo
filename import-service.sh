@@ -111,7 +111,7 @@ setImmediate(async function () {
 
   const ecr = new ECR({ ...awsCreds })
 
-  const serviceRepository = \`\${monorepoPackage.name}/\${package.name}\`
+  const serviceRepository = \`\${monorepoPackage.name}/\${NODE_ENV}/\${package.name}\`
   const image = \`\${serviceRepository}:\${package.version}\`
 
   const DockerfilePath = process.argv.includes('--Dockerfile')

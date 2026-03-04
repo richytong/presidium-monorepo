@@ -71,7 +71,7 @@ async function test() {
   secretsFile.write(\`AWS_SECRET_ACCESS_KEY=\${awsCreds.secretAccessKey}\\n\`)
   secretsFile.write(\`AWS_REGION=\${awsCreds.region}\\n\`)
   if (package.secrets) {
-    for (const secretName of package.secrets) {
+    for (const secretName of package.secrets[NODE_ENV] ?? []) {
       try {
         const secret = await secretsManager.getSecret(\`\${NODE_ENV}/\${secretName}\`)
         secretsFile.write(\`\${secretName}=\${secret.SecretString}\\n\`)
@@ -206,7 +206,7 @@ setImmediate(async function () {
 
   const ecr = new ECR({ ...awsCreds })
 
-  const serviceRepository = \`\${monorepoPackage.name}/\${package.name}\`
+  const serviceRepository = \`\${monorepoPackage.name}/\${NODE_ENV}/\${package.name}\`
   const image = \`\${serviceRepository}:\${package.version}\`
 
   const DockerfilePath = process.argv.includes('--Dockerfile')
@@ -312,7 +312,7 @@ setImmediate(async () => {
   const [username, password] = decoded.split(':')
 
   const serviceName = package.name.toLowerCase().replace(/[^a-z0-9]/g, '-')
-  const servicePort = ports[package.name]
+  const servicePort = ports[serviceName]
 
   const serviceOptions = {
     image: \`\${registry}/\${image}\`,

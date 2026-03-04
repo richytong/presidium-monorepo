@@ -4,5 +4,8 @@
   },
   "staging": {
     "name": "staging-example-swarm"
+  },
+  "test": {
+    "name": "test-example-swarm"
   }
 }
